@@ -66,4 +66,4 @@ jobs:
 
       - name: Report results
         if: success()
-        run: ./vendor/bin/coveralls -v
+        run: ./vendor/bin/php-coveralls -v
