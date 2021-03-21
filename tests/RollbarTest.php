@@ -68,8 +68,7 @@ class RollbarTest extends \Orchestra\Testbench\TestCase
 
     public function testRollbarAgentConfigurationAdapter()
     {
-        $handler = Mockery::mock(AgentHandler::class);
-        $this->app->config->set('logging.channels.rollbar.handler', $handler);
+        $this->app->config->set('logging.channels.rollbar.handler', AgentHandler::class);
 
         $client = $this->app->make(RollbarLogger::class);
         $config = $client->extend([]);
