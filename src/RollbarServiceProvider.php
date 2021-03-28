@@ -42,6 +42,13 @@ class RollbarServiceProvider extends ServiceProvider
             $handleError = (bool) Arr::pull($config, 'handle_error');
             $handleFatal = (bool) Arr::pull($config, 'handle_fatal');
 
+            // Convert a request for the Rollbar agent to handle the logs to
+            // the format expected by `Rollbar::init`.
+            // @see https://github.com/rollbar/rollbar-php-laravel/issues/85
+            $handler = Arr::get($config, 'handler');
+            if ($handler === AgentHandler::class) {
+                $config['handler'] = 'agent';
+            }
             Rollbar::init($config, $handleException, $handleError, $handleFatal);
 
             return Rollbar::logger();

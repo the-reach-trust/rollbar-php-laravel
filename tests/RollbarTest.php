@@ -4,6 +4,7 @@ namespace Rollbar\Laravel\Tests;
 
 use Rollbar\Laravel\RollbarServiceProvider;
 use Rollbar\Laravel\MonologHandler;
+use Rollbar\Laravel\AgentHandler;
 use Rollbar\RollbarLogger;
 use Monolog\Logger;
 use Mockery;
@@ -32,6 +33,9 @@ class RollbarTest extends \Orchestra\Testbench\TestCase
 
         $handler = $this->app->make(MonologHandler::class);
         $this->assertInstanceOf(MonologHandler::class, $handler);
+
+        $handler = $this->app->make(AgentHandler::class);
+        $this->assertInstanceOf(AgentHandler::class, $handler);
     }
 
     public function testIsSingleton()
@@ -60,6 +64,20 @@ class RollbarTest extends \Orchestra\Testbench\TestCase
         $this->assertEquals('staging', $config['environment']);
         $this->assertEquals('/tmp', $config['root']);
         $this->assertEquals(E_ERROR, $config['included_errno']);
+    }
+
+    public function testRollbarAgentConfigurationAdapter()
+    {
+        $this->app->config->set('logging.channels.rollbar.handler', AgentHandler::class);
+
+        $client = $this->app->make(RollbarLogger::class);
+        $config = $client->extend([]);
+
+        $this->assertEquals(
+            'agent',
+            $config['handler'],
+            'AgentHandler given as Laravel logging config handler should be given as "agent" to Rollbar::init'
+        );
     }
 
     // public function testAutomaticContext()
