@@ -9,7 +9,7 @@ name: Rollbar-PHP-Laravel CI
 
 # Fire this action on pushes to main branch (master) as well as other branches
 # or pull requests. Also, run every day at 02:42 GMT -- this catches failures
-# from dependencies that update indepdently.
+# from dependencies that update independently.
 on:
   push:
   pull_request:
@@ -17,21 +17,17 @@ on:
     - cron: '42 2 * * *'
 
 jobs:
-  # Check that this runs on PHP on all versions we claim to support, on both
-  # UNIX-like and Windows environments, and that use both the lowest possible
-  # compatible version as well as the most-recent stable version. This will
-  # fail-fast by default, so we include our edgiest versions (currently 7.4)
-  # first as they're most likely to fail.
-  # @seealso https://freek.dev/1546
-  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
-  php-tests:
+  # Check that this runs on all combinations of Laravel we claim to support.
+  laravel-tests:
     strategy:
       matrix:
-        php: [7.3, 7.2]
-        dependency: [stable]
         os: [ubuntu]
-
-    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
+        php: [7.4]
+        laravel: [^7.0]
+        rollbar-php-laravel: [^7.0]
+    env:
+      ROLLBAR_TOKEN: ad865e76e7fb496fab096ac07b1dbabb
+    name: Laravel ${{ matrix.laravel }} PHP ${{ matrix.php }} ${{ matrix.os }} Rollbar ${{ matrix.rollbar-php }}
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
@@ -42,29 +38,70 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
-          ini-values: ${{ matrix.ini }}
-          coverage: xdebug
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Create Laravel test app
+        run: composer create-project laravel/laravel rollbar-test-app
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
-          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
+      - name: Install rollbar-php-laravel package
+        working-directory: rollbar-test-app
+        run: |
+          echo "ROLLBAR_TOKEN=${ROLLBAR_TOKEN}" >> .env
+          echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}" >> .env
+          chmod 400 .env
 
-      - name: Install dependencies
-        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
+      - name: Configure Laravel to use Rollbar and configure Rollbar to invoke logging callback
+        working-directory: rollbar-test-app
+        run: |
+          > config/logging.php echo '<?php return array (
+              "default" => "rollbar",
+              "channels" => array (
+                "rollbar" => array (
+                  "driver" => "monolog",
+                  "handler" => \Rollbar\Laravel\MonologHandler::class,
+                  "access_token" => env("ROLLBAR_TOKEN"),
+                  "level" => "debug",
+                  "check_ignore" => "check_ignore",
+                )
+              )
+            );
+          '
+          touch app/helpers.php
+          > tmp-composer.json jq '.autoload += { "files": [ "app/helpers.php" ] }' composer.json
+          mv tmp-composer.json composer.json
+          composer dump-autoload
 
-      - name: Make logs directory
-        run: mkdir -p build/logs
+      - name: Define logging callback that invokes when Laravel logs through Rollbar
+        working-directory: rollbar-test-app
+        run: |
+          > app/helpers.php echo '<?php
+            function temp_file() {
+              return env("RUNNER_TEMP") . DIRECTORY_SEPARATOR . env("GITHUB_RUN_ID") . ".tmp.txt";
+            }
+            function check_ignore($isUncaught, $toLog, $payload) {
+              file_put_contents(temp_file(), (string)$toLog);
+              return false;
+            }
+          '
 
-      - name: Execute tests
-        run: composer test
+      - name: Define Laravel tests to exercise and verify logging
+        working-directory: rollbar-test-app
+        run: |
+          > tests/Feature/LoggingTest.php echo '<?php
+            namespace Tests\Feature;
+            class LoggingTest extends \Tests\TestCase {
+              public function test_log_call_invokes_rollbar_check_ignore()
+              {
+                $value = env("GITHUB_RUN_ID");
+                \Log::error($value);
+                $this->assertFileExists(temp_file(),
+                  "Rollbar check_ignore handler not invoked, suggesting an issue integrating Rollbar into Laravel.");
+                $this->assertSame($value, file_get_contents(temp_file()),
+                  "check_ignore file did not contain expected value, suggesting file left by another process.");
+              }
+            }
+          '
 
-      - name: Report results
-        if: success()
-        run: ./vendor/bin/php-coveralls -v || true
+      - name: Invoke the Laravel test suite
+        working-directory: rollbar-test-app
+        run: |
+          ./vendor/bin/phpunit
