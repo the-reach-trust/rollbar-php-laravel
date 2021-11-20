@@ -1,4 +1,9 @@
 # Primary CI checks for Rollbar-PHP-Laravel.
+# We're checking that logging within Laravel passes through the Rollbar Laravel
+# integration when that integration is properly installed. We make this check
+# for all supported combinations of Laravel, Rollbar, and PHP. We are not
+# checking that messages are properly sent to Rollbar: that's handled by
+# rollbar-php.
 #
 # Test with act:
 #   brew install act
