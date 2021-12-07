@@ -27,9 +27,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        php: [7.4, 7.3, 7.2, 7.1]
-        laravel: [^8, ^7, ^6, ^5.8, ^5.7, ^5.6]
-        rollbar-php-laravel: [^7, 4.*]
+        php: [7.4]
+        laravel: [^8]
+        rollbar-php-laravel: [^7]
+        #simplify#php: [7.4, 7.3, 7.2, 7.1]
+        #simplify#laravel: [^8, ^7, ^6, ^5.8, ^5.7, ^5.6]
+        #simplify#rollbar-php-laravel: [^7, 4.*]
         #fails#php: [7.0]
         #fails#laravel: [^5.5]
         #fails#rollbar-php-laravel: [2.*]
