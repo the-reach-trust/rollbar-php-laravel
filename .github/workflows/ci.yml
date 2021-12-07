@@ -149,7 +149,8 @@ jobs:
             }
             function check_ignore($isUncaught, $toLog, $payload) {
               // write log message to a file for inspection
-              file_put_contents(temp_file(), (string)$toLog);
+              $ok = file_put_contents(temp_file(), (string)$toLog);
+              var_dump($ok);
               // return indication that the log should be dropped
               return true;
             }
@@ -167,7 +168,9 @@ jobs:
                 // Laravel logging mechanism into Rollbar
                 $value = sprintf("%s-%s", env("GITHUB_RUN_ID"), rand());
 
+                var_dump("x");
                 \Log::error($value);
+                var_dump("y");
 
                 // check that we have our random value written into our local file
                 $this->assertFileExists(temp_file(),
