@@ -143,7 +143,9 @@ jobs:
         run: |
           > app/helpers.php echo '<?php
             function temp_file() {
-              return env("RUNNER_TEMP") . DIRECTORY_SEPARATOR . env("GITHUB_RUN_ID") . ".tmp.txt";
+              $x = env("RUNNER_TEMP") . DIRECTORY_SEPARATOR . env("GITHUB_RUN_ID") . ".tmp.txt";
+              var_dump($x);
+              return $x;
             }
             function check_ignore($isUncaught, $toLog, $payload) {
               // write log message to a file for inspection
