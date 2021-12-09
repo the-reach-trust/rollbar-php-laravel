@@ -90,7 +90,7 @@ jobs:
             rollbar-php-laravel: 4.*
     env:
       ROLLBAR_TOKEN: "ad865e76e7fb496fab096ac07b1dbabb"
-    name: ${{ matrix.laravel }}/${{ matrix.rollbar-php-laravel }}/${{ matrix.php }}(${{ matrix.os }})
+    name: Laravel ${{ matrix.laravel }}/Rollbar ${{ matrix.rollbar-php-laravel }}/PHP ${{ matrix.php }}(${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
