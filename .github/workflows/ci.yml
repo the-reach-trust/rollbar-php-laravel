@@ -93,6 +93,11 @@ jobs:
     name: Laravel ${{ matrix.laravel }}/Rollbar ${{ matrix.rollbar-php-laravel }}/PHP ${{ matrix.php }}(${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
     steps:
+      # Note: this step is currently unused, because we are installing Rollbar
+      # Note: from Packagist 3 steps later. This was done to prove out currently
+      # Note: working combinations from published versions. The next iteration
+      # Note: will move the CI to use the correct branch, so that pre-published
+      # Note: code will be tested.
       - name: Checkout the code
         uses: actions/checkout@v2
 
