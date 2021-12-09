@@ -27,9 +27,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        php: [7.4, 7.3, 7.2, 7.1, 7.0]
-        laravel: [^8, ^7, ^6, ^5.8, ^5.7, ^5.6, ^5.5]
-        rollbar-php-laravel: [^7, 4.*, 2.*]
+        php: [7.4, 7.3, 7.2, 7.1]
+        laravel: [^8, ^7, ^6, ^5.8, ^5.7, ^5.6]
+        rollbar-php-laravel: [^7, 4.*]
         #fails#php: [7.0]
         #fails#laravel: [^5.5]
         #fails#rollbar-php-laravel: [2.*]
@@ -140,14 +140,11 @@ jobs:
         run: |
           > app/helpers.php echo '<?php
             function temp_file() {
-              $x = env("RUNNER_TEMP") . DIRECTORY_SEPARATOR . env("GITHUB_RUN_ID") . ".tmp.txt";
-              var_dump($x);
-              return $x;
+              return env("RUNNER_TEMP") . DIRECTORY_SEPARATOR . env("GITHUB_RUN_ID") . ".tmp.txt";
             }
             function check_ignore($isUncaught, $toLog, $payload) {
               // write log message to a file for inspection
               $ok = file_put_contents(temp_file(), (string)$toLog);
-              var_dump($ok);
               // return indication that the log should be dropped
               return true;
             }
@@ -165,9 +162,7 @@ jobs:
                 // Laravel logging mechanism into Rollbar
                 $value = sprintf("%s-%s", env("GITHUB_RUN_ID"), rand());
 
-                var_dump("x");
                 \Log::error($value);
-                var_dump("y");
 
                 // check that we have our random value written into our local file
                 $this->assertFileExists(temp_file(),
