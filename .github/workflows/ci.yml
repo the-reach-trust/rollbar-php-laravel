@@ -103,7 +103,7 @@ jobs:
           extensions: curl
 
       - name: Create Laravel test app
-        run: composer create-project laravel/laravel rollbar-test-app
+        run: composer create-project laravel/laravel rollbar-test-app ${{ matrix.laravel }}
 
       - name: Install rollbar-php-laravel package
         working-directory: rollbar-test-app
