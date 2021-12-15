@@ -42,6 +42,9 @@ jobs:
     name: Laravel ${{ matrix.laravel }} on PHP ${{ matrix.php }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
     steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
         with:
@@ -50,9 +53,6 @@ jobs:
 
       - name: Create Laravel test app
         run: composer create-project laravel/laravel rollbar-test-app ${{ matrix.laravel }}
-
-      - name: Checkout the code
-        uses: actions/checkout@v2
 
       - name: Install that code using Composer rigged to look in the parent directory
         working-directory: rollbar-test-app
