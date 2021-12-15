@@ -37,19 +37,6 @@ jobs:
           # Laravel 8 requires php 7.3+, so exclude all PHP versions prior to 7.3
           - laravel: ^8
             php: 7.2
-          - laravel: ^8
-            php: 7.1
-          - laravel: ^8
-            php: 7.0
-          # Laravel 7 and 6 requires php 7.2+, so exclude all PHP versions prior to 7.2
-          - laravel: ^7
-            php: 7.1
-          - laravel: ^7
-            php: 7.0
-          - laravel: ^6
-            php: 7.1
-          - laravel: ^6
-            php: 7.0
     env:
       ROLLBAR_TOKEN: "ad865e76e7fb496fab096ac07b1dbabb"
     name: Laravel ${{ matrix.laravel }} on PHP ${{ matrix.php }} (${{ matrix.os }})
