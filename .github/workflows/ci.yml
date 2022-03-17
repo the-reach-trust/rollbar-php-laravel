@@ -69,10 +69,20 @@ jobs:
 
       - name: Install that code using Composer rigged to look in the parent directory
         working-directory: rollbar-test-app
+        continue-on-error: true
         run: |
           composer config repositories.local '{"type":"path", "url":".."}'
           composer require rollbar/rollbar-laravel
-          composer update psr/log
+          
+      - name: Try to resolve requirements into an installable set of packages
+        working-directory: rollbar-test-app
+        # This adds time, so only run this if the previous step fails.
+        if: ${{ failure() }}
+        run: composer update
+      
+      - name: Setup .env
+        working-directory: rollbar-test-app
+        run: |
           echo "ROLLBAR_TOKEN=${ROLLBAR_TOKEN}" >> .env
           echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}" >> .env
           chmod 400 .env
