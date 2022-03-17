@@ -68,6 +68,7 @@ jobs:
         run: composer create-project laravel/laravel rollbar-test-app ${{ matrix.laravel }}
 
       - name: Install that code using Composer rigged to look in the parent directory
+        id: composer_require
         working-directory: rollbar-test-app
         continue-on-error: true
         run: |
@@ -77,7 +78,7 @@ jobs:
       - name: Try to resolve requirements into an installable set of packages
         working-directory: rollbar-test-app
         # This adds time, so only run this if the previous step fails.
-        if: ${{ failure() }}
+        if: ${{ steps.composer_require.outcome == 'failure' }}
         run: composer update
       
       - name: Setup .env
