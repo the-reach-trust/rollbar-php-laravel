@@ -79,7 +79,12 @@ jobs:
         working-directory: rollbar-test-app
         # This adds time, so only run this if the previous step fails.
         if: ${{ steps.composer_require.outcome == 'failure' }}
-        run: composer update
+        # We are ok removing the lock file since it was generated in step 3,
+        # before we included all our requirements.
+        run: |
+          rm composer.lock
+          composer require rollbar/rollbar-laravel
+          composer install
       
       - name: Setup .env
         working-directory: rollbar-test-app
