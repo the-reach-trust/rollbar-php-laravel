@@ -34,6 +34,12 @@ jobs:
         php: [8.1, 8.0, 7.4, 7.3, 7.2]
         laravel: [^9, ^8, ^7, ^6]
         exclude:
+          # Laravel 6 requires php 7.2-8.0, so exclude all php versions after 8.1
+          - laravel: ^6
+            php: 8.1
+          # Laravel 7 requires php 7.2-8.0, so exclude all php versions after 8.1
+          - laravel: ^7
+            php: 8.1
           # Laravel 8 requires php 7.3+, so exclude all PHP versions prior to 7.3
           - laravel: ^8
             php: 7.2
@@ -62,10 +68,27 @@ jobs:
         run: composer create-project laravel/laravel rollbar-test-app ${{ matrix.laravel }}
 
       - name: Install that code using Composer rigged to look in the parent directory
+        id: composer_require
         working-directory: rollbar-test-app
+        continue-on-error: true
         run: |
           composer config repositories.local '{"type":"path", "url":".."}'
           composer require rollbar/rollbar-laravel
+          
+      - name: Try to resolve requirements into an installable set of packages
+        working-directory: rollbar-test-app
+        # This adds time, so only run this if the previous step fails.
+        if: ${{ steps.composer_require.outcome == 'failure' }}
+        # We are ok removing the lock file since it was generated in step 3,
+        # before we included all our requirements.
+        run: |
+          rm composer.lock
+          composer require rollbar/rollbar-laravel
+          composer install
+      
+      - name: Setup .env
+        working-directory: rollbar-test-app
+        run: |
           echo "ROLLBAR_TOKEN=${ROLLBAR_TOKEN}" >> .env
           echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}" >> .env
           chmod 400 .env
