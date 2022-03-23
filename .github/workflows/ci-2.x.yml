@@ -42,8 +42,15 @@ jobs:
     name: Laravel ${{ matrix.laravel }} on PHP ${{ matrix.php }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - name: Checkout the code
+      - name: Checkout the PR Branch
         uses: actions/checkout@v2
+        if: ${{ github.event_name == 'pull_request' }}
+
+      - name: Checkout the v2 Branch
+        uses: actions/checkout@v2
+        # Set the branch to our version branch not master when scheduled.
+        ref: 'next/2.x/main'
+        if: ${{ github.event_name == 'schedule' }}
 
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
