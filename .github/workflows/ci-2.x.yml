@@ -48,9 +48,10 @@ jobs:
 
       - name: Checkout the v2 Branch
         uses: actions/checkout@v2
-        # Set the branch to our version branch not master when scheduled.
-        ref: 'next/2.x/main'
         if: ${{ github.event_name == 'schedule' }}
+        with:
+          # Set the branch to our version branch not master when scheduled.
+          ref: 'next/2.x/main'
 
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
