@@ -28,7 +28,7 @@ class MonologHandler extends RollbarHandler
             $record->channel,
             $record->level,
             $record->message,
-            array_merge($record->toArray()['context'], $this->addContext($record->context)),
+            $this->addContext($record->context),
             $record->extra,
             $record->formatted));
     }
