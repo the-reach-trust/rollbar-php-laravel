@@ -3,28 +3,41 @@
 namespace Rollbar\Laravel;
 
 use Monolog\Handler\RollbarHandler;
+use Monolog\LogRecord;
 
 class MonologHandler extends RollbarHandler
 {
     protected $app;
 
+    /**
+     * @param $app
+     * @return void
+     */
     public function setApp($app)
     {
         $this->app = $app;
     }
 
-    protected function write(array $record): void
+    /**
+     * @param LogRecord $record
+     * @return void
+     */
+    protected function write(LogRecord $record): void
     {
-        $record['context'] = $this->addContext($record['context']);
-        parent::write($record);
+        parent::write(new LogRecord($record->datetime,
+            $record->channel,
+            $record->level,
+            $record->message,
+            $this->addContext($record->context),
+            $record->extra,
+            $record->formatted));
     }
 
     /**
-     * Add Laravel specific information to the context.
-     *
      * @param array $context
+     * @return array
      */
-    protected function addContext(array $context = [])
+    protected function addContext(array $context = []): array
     {
         $config = $this->rollbarLogger->extend([]);
 
@@ -47,7 +60,7 @@ class MonologHandler extends RollbarHandler
                     } elseif (method_exists($data, 'getKey')) {
                         $person['id'] = $data->getKey();
                     }
-                    
+
                     if (isset($person['id'])) {
                         if (isset($data->username)) {
                             $person['username'] = $data->username;
