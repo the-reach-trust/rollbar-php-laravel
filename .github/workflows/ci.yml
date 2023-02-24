@@ -68,23 +68,16 @@ jobs:
         run: composer create-project laravel/laravel rollbar-test-app ${{ matrix.laravel }}
 
       - name: Install that code using Composer rigged to look in the parent directory
-        id: composer_require
         working-directory: rollbar-test-app
-        continue-on-error: true
+        # We arbitrarily set the version to 1.0.0, because we just need composer
+        # to consider it to be stable.
         run: |
-          composer config repositories.local '{"type":"path", "url":".."}'
-          composer require rollbar/rollbar-laravel
-          
-      - name: Try to resolve requirements into an installable set of packages
-        working-directory: rollbar-test-app
-        # This adds time, so only run this if the previous step fails.
-        if: ${{ steps.composer_require.outcome == 'failure' }}
-        # We are ok removing the lock file since it was generated in step 3,
-        # before we included all our requirements.
-        run: |
-          rm composer.lock
-          composer require rollbar/rollbar-laravel
-          composer install
+          composer config repositories.local '{
+            "type":"path", 
+            "url":"..", 
+            "options": {"versions": {"rollbar/rollbar-laravel": "1.0.0"}}
+          }'
+          composer require rollbar/rollbar-laravel -W
       
       - name: Setup .env
         working-directory: rollbar-test-app
