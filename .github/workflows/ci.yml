@@ -31,25 +31,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        php: [8.1, 8.0, 7.4, 7.3, 7.2]
-        laravel: [^9, ^8, ^7, ^6]
-        exclude:
-          # Laravel 6 requires php 7.2-8.0, so exclude all php versions after 8.1
-          - laravel: ^6
-            php: 8.1
-          # Laravel 7 requires php 7.2-8.0, so exclude all php versions after 8.1
-          - laravel: ^7
-            php: 8.1
-          # Laravel 8 requires php 7.3+, so exclude all PHP versions prior to 7.3
-          - laravel: ^8
-            php: 7.2
-          # Laravel 9 requires php ^8.0.2, so exclude all PHP versions prior to 8.0.2
-          - laravel: ^9
-            php: 7.2
-          - laravel: ^9
-            php: 7.3
-          - laravel: ^9
-            php: 7.4
+        php: [8.2, 8.1]
+        laravel: [^10]
     env:
       ROLLBAR_TOKEN: "ad865e76e7fb496fab096ac07b1dbabb"
     name: Laravel ${{ matrix.laravel }} on PHP ${{ matrix.php }} (${{ matrix.os }})
@@ -77,6 +60,8 @@ jobs:
             "url":"..", 
             "options": {"versions": {"rollbar/rollbar-laravel": "1.0.0"}}
           }'
+          composer config minimum-stability dev
+          composer config prefer-stable true
           composer require rollbar/rollbar-laravel -W
       
       - name: Setup .env
@@ -135,7 +120,7 @@ jobs:
                 // Laravel logging mechanism into Rollbar
                 $value = sprintf("%s-%s", env("GITHUB_RUN_ID"), rand());
 
-                \Log::error($value);
+                \Illuminate\Support\Facades\Log::error($value);
 
                 // check that we have our random value written into our local file
                 $this->assertFileExists(temp_file(),
