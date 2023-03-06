@@ -4,7 +4,7 @@ use Rollbar\Rollbar;
 use Rollbar\RollbarLogger;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Rollbar\Laravel\MonologHandler;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,14 +13,14 @@ class RollbarServiceProvider extends ServiceProvider
     /**
      * Register the service provider.
      */
-    public function register()
+    public function register(): void
     {
         // Don't register rollbar if it is not configured.
         if ($this->stop() === true) {
             return;
         }
 
-        $this->app->singleton(RollbarLogger::class, function ($app) {
+        $this->app->singleton(RollbarLogger::class, function (Application $app) {
 
             $defaults = [
                 'environment'       => $app->environment(),
@@ -54,7 +54,7 @@ class RollbarServiceProvider extends ServiceProvider
             return Rollbar::logger();
         });
 
-        $this->app->singleton(MonologHandler::class, function ($app) {
+        $this->app->singleton(MonologHandler::class, function (Application $app) {
 
             $level = static::config('level', 'debug');
             
@@ -66,7 +66,7 @@ class RollbarServiceProvider extends ServiceProvider
     }
 
     /**
-     * Check if we should prevent the service from registering
+     * Check if we should prevent the service from registering.
      *
      * @return boolean
      */
@@ -82,15 +82,16 @@ class RollbarServiceProvider extends ServiceProvider
     }
 
     /**
-     * Return a rollbar logging config
+     * Return a rollbar logging config.
      *
-     * @param array|string $key
-     * @param mixed $default
+     * @param string $key     The config key to lookup.
+     * @param mixed  $default The default value to return if the config is not found.
+     *
      * @return mixed
      */
-    protected static function config($key = '', $default = null)
+    protected static function config(string $key = '', mixed $default = null): mixed
     {
-        $envKey = 'ROLLBAR_'.strtoupper($key);
+        $envKey = 'ROLLBAR_' . strtoupper($key);
 
         if ($envKey === 'ROLLBAR_ACCESS_TOKEN') {
             $envKey = 'ROLLBAR_TOKEN';
