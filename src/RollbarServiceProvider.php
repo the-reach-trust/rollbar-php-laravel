@@ -49,6 +49,7 @@ class RollbarServiceProvider extends ServiceProvider
             if ($handler === AgentHandler::class) {
                 $config['handler'] = 'agent';
             }
+            $config['framework'] = 'laravel ' . app()->version();
             Rollbar::init($config, $handleException, $handleError, $handleFatal);
 
             return Rollbar::logger();
