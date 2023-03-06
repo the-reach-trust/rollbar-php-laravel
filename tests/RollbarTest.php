@@ -11,9 +11,10 @@ use Mockery;
 
 class RollbarTest extends \Orchestra\Testbench\TestCase
 {
+    private string $access_token = 'B42nHP04s06ov18Dv8X7VI4nVUs6w04X';
+
     protected function setUp(): void
     {
-        $this->access_token = 'B42nHP04s06ov18Dv8X7VI4nVUs6w04X';
         putenv('ROLLBAR_TOKEN=' . $this->access_token);
 
         parent::setUp();

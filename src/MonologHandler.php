@@ -2,39 +2,53 @@
 
 namespace Rollbar\Laravel;
 
+use Illuminate\Contracts\Foundation\Application;
 use Monolog\Handler\RollbarHandler;
 use Monolog\LogRecord;
 
 class MonologHandler extends RollbarHandler
 {
-    protected $app;
+    protected Application $app;
 
     /**
-     * @param $app
+     * Sets the Laravel application, so it can be used to get the current user and session data later.
+     *
+     * @param Application $app The Laravel application.
+     *
      * @return void
      */
-    public function setApp($app)
+    public function setApp(Application $app): void
     {
         $this->app = $app;
     }
 
     /**
-     * @param LogRecord $record
+     * Custom write method to add the Laravel context to the log record for Rollbar.
+     *
+     * @param LogRecord $record The Monolog log record.
+     *
      * @return void
      */
     protected function write(LogRecord $record): void
     {
-        parent::write(new LogRecord($record->datetime,
-            $record->channel,
-            $record->level,
-            $record->message,
-            $this->addContext($record->context),
-            $record->extra,
-            $record->formatted));
+        parent::write(
+            new LogRecord(
+                $record->datetime,
+                $record->channel,
+                $record->level,
+                $record->message,
+                $this->addContext($record->context),
+                $record->extra,
+                $record->formatted
+            )
+        );
     }
 
     /**
-     * @param array $context
+     * Adds the Laravel context to the log record for Rollbar. This includes person and session data.
+     *
+     * @param array $context The {@see LogRecord::context} array.
+     *
      * @return array
      */
     protected function addContext(array $context = []): array
