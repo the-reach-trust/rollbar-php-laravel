@@ -4,7 +4,6 @@ use Rollbar\Rollbar;
 use Rollbar\RollbarLogger;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,7 +19,7 @@ class RollbarServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->singleton(RollbarLogger::class, function (Application $app) {
+        $this->app->singleton(RollbarLogger::class, function ($app) {
 
             $defaults = [
                 'environment'       => $app->environment(),
@@ -55,7 +54,7 @@ class RollbarServiceProvider extends ServiceProvider
             return Rollbar::logger();
         });
 
-        $this->app->singleton(MonologHandler::class, function (Application $app) {
+        $this->app->singleton(MonologHandler::class, function ($app) {
 
             $level = static::config('level', 'debug');
             

@@ -2,22 +2,21 @@
 
 namespace Rollbar\Laravel;
 
-use Illuminate\Contracts\Foundation\Application;
 use Monolog\Handler\RollbarHandler;
 use Monolog\LogRecord;
 
 class MonologHandler extends RollbarHandler
 {
-    protected Application $app;
+    protected $app;
 
     /**
      * Sets the Laravel application, so it can be used to get the current user and session data later.
      *
-     * @param Application $app The Laravel application.
+     * @param $app The Laravel application.
      *
      * @return void
      */
-    public function setApp(Application $app): void
+    public function setApp($app): void
     {
         $this->app = $app;
     }
