@@ -1,4 +1,6 @@
-# Rollbar for Laravel
+# Repository needs to be moved to [Gitlab](https://gitlab.com/the-reach-trust)
+
+## Rollbar for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/rollbar/rollbar-laravel.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar-laravel)
 ![Build Status](https://github.com/rollbar/rollbar-php-laravel/workflows/Rollbar-PHP-Laravel%20CI/badge.svg)
@@ -6,26 +8,26 @@
 
 Rollbar error monitoring integration for Laravel projects. This library adds a listener to Laravel's logging component. Laravel's session information will be sent in to Rollbar, as well as some other helpful information such as 'environment', 'server', and 'session'.
 
-## Setup Instructions
+### Setup Instructions
 
 1. [Sign up for a Rollbar account](https://rollbar.com/signup)
 2. If you're using Laravel 5.6 and up follow [Installation](https://docs.rollbar.com/docs/laravel#section-installation) instructions in our [Laravel 5.6 and up SDK docs](https://docs.rollbar.com/docs/laravel)
 3. If you're using Laravel 5.5 or lower follow [Installation](https://docs.rollbar.com/v1.0.0/docs/laravel-55) instructions in our [Laravel 5.5 and lower SDK docs](https://docs.rollbar.com/v1.0.0/docs/laravel-55)
 
-## Usage and Reference
+### Usage and Reference
 
 For complete usage instructions and configuration reference, see our [Laravel SDK docs](https://docs.rollbar.com/docs/laravel).
   
-## Release History & Changelog
+### Release History & Changelog
 
 See our [Releases](https://github.com/rollbar/rollbar-php-laravel/releases) page for a list of all releases, including changes.
 
-### Laravel 5.5 and below
+#### Laravel 5.5 and below
 Laravel 5.6 now requires PHP >= 7.1. As of `rollbar/rollbar-php-laravel:v3.0.0` and up master also supports 5.6.
 
 We still maintain support for Laravel 5.5 and below on branch `laravel-5.5` and releases in the `2.x.x` major.
 
-## Related projects
+### Related projects
 
 This project is a Laravel wrapper of Rollbar PHP: [Rollbar PHP](https://github.com/rollbar/rollbar-php)
 
@@ -38,7 +40,7 @@ Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollba
 
 Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
-## Help / Support
+### Help / Support
 
 If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
 
